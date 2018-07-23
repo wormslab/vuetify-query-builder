@@ -1,19 +1,26 @@
 {
-  "name": "query-builder",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@wormslab/vuetify-query-builder",
+  "version": "1.0.1",
+  "private": false,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "NODE_ENV=development vue-cli-service serve",
+    "build": "NODE_ENV=production vue-cli-service build --target lib --name vuetify-query-builder src/QueryBuilder.vue",
     "lint": "vue-cli-service lint"
   },
+  "main": "./dist/vuetify-query-builder.common.js",
   "dependencies": {
-    "vue": "^2.5.16"
+    "dot-object": "^1.7.0",
+    "moment": "^2.22.2",
+    "underscore": "^1.9.1",
+    "vue": "^2.5.16",
+    "vuetify": "^1.1.6",
+    "vuedraggable": "^2.16.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-rc.5",
     "@vue/cli-plugin-eslint": "^3.0.0-rc.5",
     "@vue/cli-service": "^3.0.0-rc.5",
+    "css-loader": "^1.0.0",
     "vue-template-compiler": "^2.5.16"
   },
   "eslintConfig": {
@@ -35,6 +42,13 @@
       "autoprefixer": {}
     }
   },
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.js"
+  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",
