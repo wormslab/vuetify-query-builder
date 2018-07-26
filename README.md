@@ -19,3 +19,5 @@ npm run build
 ```
 npm run lint
 ```
+# vuetify-query-builder
+vuetify-query-builder
