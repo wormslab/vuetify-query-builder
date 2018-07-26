@@ -7,69 +7,75 @@
                          :query="query"
                          @enter-keyup="_handleEnterKeyUp"
     />
-    <section class="query-builder-limit">
-      <span>페이지당</span>
-      <div class="limit-select-box">
-        <v-select :items="limits" v-model="query.limit" item-text="text" item-value="value" single-line />
-      </div>
-      <span>개 노출</span>
-    </section>
-    <section class="query-builder-date">
-      <span class="label-text">기간</span>
-      <v-menu ref="startMenu"
-              lazy
-              :close-on-content-click="false"
-              v-model="startMenu"
-              transition="scale-transition"
-              offset-y
-              full-width
-              :nudge-right="40"
-              min-width="290px"
-              :return-value.sync="query.from"
-      >
-        <v-text-field slot="activator"
-                      label="From"
-                      v-model="query.from"
-                      prepend-icon="event"
-                      readonly
-        ></v-text-field>
-        <v-date-picker v-model="query.from" no-title scrollable>
-          <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="startMenu = false">Cancel</v-btn>
-          <v-btn flat color="primary" @click="$refs.startMenu.save(query.from)">OK</v-btn>
-        </v-date-picker>
-      </v-menu>
-      <span class="tilt"> ~ </span>
-      <v-menu ref="endMenu"
-              lazy
-              :close-on-content-click="false"
-              v-model="endMenu"
-              transition="scale-transition"
-              offset-y
-              full-width
-              :nudge-right="40"
-              min-width="290px"
-              :return-value.sync="query.to"
-      >
-        <v-text-field slot="activator"
-                      label="To"
-                      v-model="query.to"
-                      prepend-icon="event"
-                      readonly
-        ></v-text-field>
-        <v-date-picker v-model="query.to" no-title scrollable>
-          <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="endMenu = false">Cancel</v-btn>
-          <v-btn flat color="primary" @click="$refs.endMenu.save(query.to)">OK</v-btn>
-        </v-date-picker>
-      </v-menu>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-1, 'week')">1 주일</v-btn>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-1, 'month')">1 개월</v-btn>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-2, 'month')">2 개월</v-btn>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-3, 'month')">3 개월</v-btn>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-6, 'month')">6 개월</v-btn>
-      <v-btn small color="primary ml-2" @click="_handleClickDateRange(-12, 'month')">12 개월</v-btn>
-    </section>
+    <slot name="limit">
+      <section class="query-builder-limit">
+        <span>페이지당</span>
+        <div class="limit-select-box">
+          <v-select :items="limits" v-model="query.limit" item-text="text" item-value="value" single-line />
+        </div>
+        <span>개 노출</span>
+      </section>
+    </slot>
+    <slot name="date-range">
+      <section class="query-builder-date">
+        <span class="label-text">기간</span>
+        <v-menu ref="startMenu"
+                lazy
+                :close-on-content-click="false"
+                v-model="startMenu"
+                transition="scale-transition"
+                offset-y
+                full-width
+                :nudge-right="40"
+                min-width="290px"
+                :return-value.sync="query.from"
+        >
+          <v-text-field slot="activator"
+                        label="From"
+                        v-model="query.from"
+                        prepend-icon="event"
+                        readonly
+          ></v-text-field>
+          <v-date-picker v-model="query.from" no-title scrollable>
+            <v-spacer></v-spacer>
+            <v-btn flat color="primary" @click="startMenu = false">Cancel</v-btn>
+            <v-btn flat color="primary" @click="$refs.startMenu.save(query.from)">OK</v-btn>
+          </v-date-picker>
+        </v-menu>
+        <span class="tilt"> ~ </span>
+        <v-menu ref="endMenu"
+                lazy
+                :close-on-content-click="false"
+                v-model="endMenu"
+                transition="scale-transition"
+                offset-y
+                full-width
+                :nudge-right="40"
+                min-width="290px"
+                :return-value.sync="query.to"
+        >
+          <v-text-field slot="activator"
+                        label="To"
+                        v-model="query.to"
+                        prepend-icon="event"
+                        readonly
+          ></v-text-field>
+          <v-date-picker v-model="query.to" no-title scrollable>
+            <v-spacer></v-spacer>
+            <v-btn flat color="primary" @click="endMenu = false">Cancel</v-btn>
+            <v-btn flat color="primary" @click="$refs.endMenu.save(query.to)">OK</v-btn>
+          </v-date-picker>
+        </v-menu>
+        <v-menu open-on-hover top offset-y>
+          <v-btn slot="activator" small outline fab color="primary" dark><v-icon>date_range</v-icon></v-btn>
+          <v-list>
+            <v-list-tile v-for="(item, index) in dateRanges" :key="index" @click="_handleClickDateRange(-item.value, item.unit)">
+              <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+      </section>
+    </slot>
     <v-btn color="primary" style="margin-left: -1px" @click="_handleClickSearch">
       <v-icon left>search</v-icon>
       <span>검색</span>
@@ -92,7 +98,8 @@
         startMenu: false,
         endMenu: false,
         limits: this._limits,
-        query: dupQuery(this._query)
+        query: dupQuery(this._query),
+        dateRanges: this._dateRanges
       }
     },
     props: {
@@ -111,6 +118,21 @@
         type: Array,
         default () {
           return [ 5, 10, 25, 50, 100 ]
+        }
+      },
+      _dateRanges: {
+        type: Array,
+        default () {
+          return [
+            { text: '1 주일', value: '1', unit: 'week' },
+            { text: '2 주일', value: '2', unit: 'week' },
+            { text: '3 주일', value: '3', unit: 'week' },
+            { text: '1 개월', value: '1', unit: 'month' },
+            { text: '2 개월', value: '2', unit: 'month' },
+            { text: '3 개월', value: '3', unit: 'month' },
+            { text: '6 개월', value: '6', unit: 'month' },
+            { text: '12 개월', value: '12', unit: 'month' }
+          ]
         }
       },
       _query: {
