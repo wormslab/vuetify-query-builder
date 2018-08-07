@@ -5,6 +5,7 @@
                          :operands="operands"
                          :depth="1"
                          :query="query"
+                         :max-depth="maxDepth"
                          @enter-keyup="_handleEnterKeyUp"
     />
     <slot name="limit">
@@ -146,6 +147,10 @@
             children: []
           }
         }
+      },
+      maxDepth: {
+        type: Number,
+        default: 3
       }
     },
     methods: {

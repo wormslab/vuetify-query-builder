@@ -6,7 +6,7 @@
         <v-select :items="types" v-model="query.operator" item-text="text" :disabled="query.children.length <= 0" item-value="value" single-line />
       </div>
       <span>규칙와 일치</span>
-      <v-btn icon @click="_handleClickAddGroup"><v-icon color="grey">playlist_add</v-icon></v-btn>
+      <v-btn icon @click="_handleClickAddGroup" :disabled="maxDepth <= depth"><v-icon color="grey">playlist_add</v-icon></v-btn>
       <v-btn icon @click="_handleClickAddRule"><v-icon color="grey">add_circle</v-icon></v-btn>
       <v-btn icon @click="_handleClickRemoveGroup(query.id)" v-if="depth > 1"><v-icon color="grey">cancel</v-icon></v-btn>
     </section>
@@ -19,6 +19,7 @@
                                  :operators="operators"
                                  :operands="operands"
                                  :depth="depth + 1"
+                                 :max-depth="maxDepth"
                                  :query="child.query"
                                  @remove-group="_handleRemoveGroup"
             />
@@ -64,6 +65,10 @@
       depth: {
         type: Number,
         default: 1
+      },
+      maxDepth: {
+        type: Number,
+        default: 3
       }
     },
     methods: {

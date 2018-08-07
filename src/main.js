@@ -47,5 +47,9 @@ const operands = [
 ]
 
 new Vue({
-  render: (h) => h('v-app', [ h('query-builder', { class: 'elevation-1 ma-3 pa-3', attrs: { types, operators, operands } }) ])
+  render: (h) => h('v-app', [
+    h('div', { attrs: { style: 'width: 600px' } }, [
+      h('query-builder', { class: 'elevation-1 ma-3 pa-3', attrs: { types, operators, operands, maxDepth: 1 } })
+    ])
+  ])
 }).$mount('#app')

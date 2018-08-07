@@ -118,9 +118,10 @@
   .query-builder-rule-container {
     display: flex;
     align-items: center;
+    position: relative;
   }
   .query-builder-rule-container > div {
-    width: 200px;
+    flex: 1 1 0;
     margin-right: 21px;
   }
 </style>
