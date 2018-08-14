@@ -28,6 +28,7 @@
           <section class="query-builder-rule-content" v-if="child.type === 'rule'" :style="`margin-left: ${(depth - 1) * 41}px`">
             <v-icon class="query-builder-drag-icon">reorder</v-icon>
             <query-builder-rule :ref="`rule${index}`"
+                                :index="(depth * 10) + index"
                                 :operators="operators"
                                 :operands="operands"
                                 :query="child.query"
@@ -77,7 +78,8 @@
       async validateAll () {
         const ret = {}
         for (const key of Object.keys(this.$refs)) {
-          ret[key] =  await this.$refs[key][0].validateAll()
+          const inst = this.$refs[key][0]
+          ret[key] = inst ? await inst.validateAll() : true
         }
         return ret
       },

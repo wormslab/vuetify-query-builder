@@ -3,10 +3,9 @@
     <div class="operand-select-box">
       <v-select :items="operands"
                 v-model="query.operand"
-                :error-messages="errors.collect('피연산자')"
+                :error-messages="errors.collect(`피연산자-${index + 1}`)"
                 v-validate="validateOperand"
-                data-vv-name="피연산자"
-                data-vv-validate-on="blur"
+                :data-vv-name="`피연산자-${index + 1}`"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
@@ -16,9 +15,9 @@
     <div class="operator-select-box">
       <v-select :items="_operators"
                 v-model="query.operator"
-                :error-messages="errors.collect('연산자')"
+                :error-messages="errors.collect(`연산자-${index + 1}`)"
                 v-validate="validateOperator"
-                data-vv-name="연산자"
+                :data-vv-name="`연산자-${index + 1}`"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
@@ -27,9 +26,9 @@
     </div>
     <div class="value-text-field" v-if="!unaryOperators.includes(query.operator)">
       <v-select v-if="query.values"
-                :error-messages="errors.collect('필터값')"
+                :error-messages="errors.collect(`필터값-${index + 1}`)"
                 v-validate="validateValue"
-                data-vv-name="필터값"
+                :data-vv-name="`필터값-${index}`"
                 :items="query.values"
                 v-model="query.value"
                 :item-text="itemText"
@@ -39,9 +38,9 @@
       />
       <v-text-field v-else
                     v-model="query.value"
-                    :error-messages="errors.collect('필터값')"
+                    :error-messages="errors.collect(`필터값-${index + 1}`)"
                     v-validate="validateValue"
-                    data-vv-name="필터값"
+                    :data-vv-name="`필터값-${index + 1}`"
                     @input="_handleChangeValue"
                     @keyup.native="_handleEnterKeyUp"
       />
@@ -57,6 +56,10 @@
       }
     },
     props: {
+      index: {
+        type: Number,
+        default: 0
+      },
       operators: {
         type: Array,
         required: true

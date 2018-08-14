@@ -3,7 +3,7 @@
     <query-builder :types="types"
                    :operators="operators"
                    :operands="operands"
-                   :max-depth="1"
+                   :max-depth="3"
                    :_query="query"
     />
   </section>
