@@ -177,6 +177,14 @@
         this.query.to = current
       }
     },
+    watch: {
+      '_query': {
+        handler (obj) {
+          this.query = dupQuery(obj)
+        },
+        deep: true
+      }
+    },
     components: {
       QueryBuilderGroup
     }

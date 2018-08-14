@@ -71,20 +71,24 @@
           this.query.type = item.type
           this.query.values = item.values
           this.query.operandError = ''
+          this.$forceUpdate()
         }
       },
       _handleChangeOperator (value) {
         const item = this.operators.find(v => v.value === value)
         if (item) {
           this.query.operatorError = ''
+          this.$forceUpdate()
         }
       },
       _handleChangeValues () {
         this.query.valueError = ''
+        this.$forceUpdate()
       },
       _handleChangeValue (value) {
         if (value.length > 0) {
           this.query.valueError = ''
+          this.$forceUpdate()
         }
       },
       _handleEnterKeyUp (event) {
