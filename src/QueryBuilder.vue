@@ -1,6 +1,7 @@
 <template>
   <section class="query-builder-container">
-    <query-builder-group :types="types"
+    <query-builder-group ref="group"
+                         :types="types"
                          :operators="operators"
                          :operands="operands"
                          :depth="1"
@@ -19,7 +20,7 @@
     </slot>
     <slot name="date-range">
       <section class="query-builder-date">
-        <span class="label-text">기간</span>
+        <span class="label-text">{{periodLabel}}</span>
         <v-menu ref="startMenu"
                 lazy
                 :close-on-content-click="false"
@@ -89,10 +90,23 @@
 </template>
 
 <script>
+  import Vue from 'vue'
+  import VeeValidate from 'vee-validate'
+  import ko from 'vee-validate/dist/locale/ko.js'
   import moment from 'moment'
   import QueryBuilderGroup from './components/QueryBuilderGroup'
-  import { validateQuery } from './lib/validator'
-  import { dupQuery } from './lib/query-helper'
+
+  Vue.use(VeeValidate, {
+    locale: 'ko',
+    dictionary: {
+      ko
+    }
+  })
+
+  function dupQuery (q) {
+    return JSON.parse(JSON.stringify(q))
+  }
+
   export default {
     data () {
       return {
@@ -113,7 +127,8 @@
         required: true
       },
       operands: {
-
+        type: Array,
+        required: true
       },
       _limits: {
         type: Array,
@@ -151,15 +166,16 @@
       maxDepth: {
         type: Number,
         default: 3
+      },
+      periodLabel: {
+        type: String,
+        default: '기간'
       }
     },
     methods: {
-      _handleClickSearch () {
-        const valid = validateQuery(this.query, { types: this.types, operands: this.operands, operators: this.operators })
-        if (!valid) {
-          return
-        }
-        this.$emit('search', dupQuery(this.query))
+      async _handleClickSearch () {
+        const valid = await this.$refs.group.validateAll()
+        this.$emit('search', dupQuery(this.query), valid)
       },
       _handleClickClear () {
         const query = dupQuery(this._query)
@@ -179,8 +195,8 @@
     },
     watch: {
       '_query': {
-        handler (obj) {
-          this.query = dupQuery(obj)
+        handler () {
+          this.query = dupQuery(this._query)
         },
         deep: true
       }

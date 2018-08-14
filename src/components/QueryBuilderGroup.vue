@@ -15,7 +15,8 @@
         <section class="query-builder-child" v-for="(child, index) in query.children" :key="index">
           <section class="query-builder-group-content" v-if="child.type === 'group'" :style="`margin-left: ${(depth - 1) * 41}px`">
             <v-icon class="query-builder-drag-icon">reorder</v-icon>
-            <query-builder-group :types="types"
+            <query-builder-group :ref="`group${index}`"
+                                 :types="types"
                                  :operators="operators"
                                  :operands="operands"
                                  :depth="depth + 1"
@@ -26,7 +27,8 @@
           </section>
           <section class="query-builder-rule-content" v-if="child.type === 'rule'" :style="`margin-left: ${(depth - 1) * 41}px`">
             <v-icon class="query-builder-drag-icon">reorder</v-icon>
-            <query-builder-rule :operators="operators"
+            <query-builder-rule :ref="`rule${index}`"
+                                :operators="operators"
                                 :operands="operands"
                                 :query="child.query"
                                 @enter-keyup="_handleEnterKeyUp"
@@ -72,6 +74,13 @@
       }
     },
     methods: {
+      async validateAll () {
+        const ret = {}
+        for (const key of Object.keys(this.$refs)) {
+          ret[key] =  await this.$refs[key][0].validateAll()
+        }
+        return ret
+      },
       _handleClickAddGroup () {
         this.query.children.push({
           type: 'group',
@@ -88,10 +97,6 @@
             operator: '',
             operand: '',
             value: '',
-            operandError: '',
-            operatorError: '',
-            valueError: '',
-            typeError: ''
           }
         })
       },

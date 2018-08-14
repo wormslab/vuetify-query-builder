@@ -3,25 +3,33 @@
     <div class="operand-select-box">
       <v-select :items="operands"
                 v-model="query.operand"
+                :error-messages="errors.collect('피연산자')"
+                v-validate="validateOperand"
+                data-vv-name="피연산자"
+                data-vv-validate-on="blur"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
                 @change="_handleChangeOperand"
-                :error-messages="operandError"
       />
     </div>
     <div class="operator-select-box">
       <v-select :items="_operators"
                 v-model="query.operator"
+                :error-messages="errors.collect('연산자')"
+                v-validate="validateOperator"
+                data-vv-name="연산자"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
                 @change="_handleChangeOperator"
-                :error-messages="operatorError"
       />
     </div>
     <div class="value-text-field" v-if="!unaryOperators.includes(query.operator)">
       <v-select v-if="query.values"
+                :error-messages="errors.collect('필터값')"
+                v-validate="validateValue"
+                data-vv-name="필터값"
                 :items="query.values"
                 v-model="query.value"
                 :item-text="itemText"
@@ -29,13 +37,19 @@
                 single-line
                 @change="_handleChangeValues"
       />
-      <v-text-field v-else v-model="query.value" @input="_handleChangeValue" @keyup.native="_handleEnterKeyUp" :error-messages="valueError"/>
+      <v-text-field v-else
+                    v-model="query.value"
+                    :error-messages="errors.collect('필터값')"
+                    v-validate="validateValue"
+                    data-vv-name="필터값"
+                    @input="_handleChangeValue"
+                    @keyup.native="_handleEnterKeyUp"
+      />
     </div>
   </section>
 </template>
 
 <script>
-  import _ from 'underscore'
   export default {
     data () {
       return {
@@ -65,29 +79,30 @@
       }
     },
     methods: {
+      async validateAll () {
+        return await this.$validator.validateAll()
+      },
       _handleChangeOperand (value) {
         const item = this.operands.find(v => v.value === value)
         if (item) {
           this.query.type = item.type
           this.query.values = item.values
-          this.query.operandError = ''
+          this.query.operator = ''
+          this.query.value = ''
           this.$forceUpdate()
         }
       },
       _handleChangeOperator (value) {
         const item = this.operators.find(v => v.value === value)
         if (item) {
-          this.query.operatorError = ''
           this.$forceUpdate()
         }
       },
       _handleChangeValues () {
-        this.query.valueError = ''
         this.$forceUpdate()
       },
       _handleChangeValue (value) {
         if (value.length > 0) {
-          this.query.valueError = ''
           this.$forceUpdate()
         }
       },
@@ -98,14 +113,14 @@
       }
     },
     computed: {
-      operandError () {
-        return _.isEmpty(this.query.operandError) ? [] : [ this.query.operandError ]
+      validateOperand () {
+        return this.query.validateOperand || 'required'
       },
-      operatorError () {
-        return _.isEmpty(this.query.operatorError) ? [] : [ this.query.operatorError ]
+      validateOperator () {
+        return this.query.validateOperator || 'required'
       },
-      valueError () {
-        return _.isEmpty(this.query.valueError) ? [] : [ this.query.valueError ]
+      validateValue () {
+        return this.query.validateValue || 'required'
       },
       _operators () {
         const operandObject = this.operands.find(v => v.value === this.query.operand)
