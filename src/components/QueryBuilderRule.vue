@@ -28,7 +28,7 @@
       <v-select v-if="query.values"
                 :error-messages="errors.collect(`필터값-${index + 1}`)"
                 v-validate="validateValue"
-                :data-vv-name="`필터값-${index}`"
+                :data-vv-name="`필터값-${index + 1}`"
                 :items="query.values"
                 v-model="query.value"
                 :item-text="itemText"
@@ -123,7 +123,22 @@
         return this.query.validateOperator || 'required'
       },
       validateValue () {
-        return this.query.validateValue || 'required'
+        const op = this.operands.find(v => v.value === this.query.operand)
+        const validators = {
+          required: true
+        }
+
+        if (op && op.type === 'number') {
+          validators['numeric'] = true
+        } else if (op && op.type === 'boolean') {
+          validators['in'] = [ true, false ]
+        } else if (op && op.type === 'date') {
+          validators['date'] = true
+        } else if (op && op.type === 'datetime') {
+          validators['datetime'] = true
+        }
+
+        return this.query.validateValue || validators
       },
       _operators () {
         const operandObject = this.operands.find(v => v.value === this.query.operand)
@@ -141,6 +156,7 @@
     display: flex;
     align-items: center;
     position: relative;
+    flex-wrap: wrap;
   }
   .query-builder-rule-container > div {
     flex: 1 1 0;

@@ -5,6 +5,7 @@
                    :operands="operands"
                    :max-depth="3"
                    :_query="query"
+                   @search="_handleSearch"
     />
   </section>
 </template>
@@ -47,7 +48,15 @@
         { text: '코드 재전송', value: 'resend_code' },
         { text: '알림톡 재전송', value: 'resend_notice' },
       ]
-    }
+    },
+    { text: 'BOOL', value: 'bool_test', type: 'boolean', values: [
+        { text: 'True', value: true },
+        { text: 'False', value: false },
+        { text: 'Must fail', value: 'true1' },
+      ]
+    },
+    { text: 'DATE', value: 'date_test', type: 'date' },
+    { text: 'DATETIME', value: 'datetime_test', type: 'datetime' }
   ]
   export default {
     data() {
@@ -64,7 +73,11 @@
         }
       }
     },
-
+    methods: {
+      _handleSearch (query, validator) {
+        console.log(query, validator)
+      }
+    },
     components: {
       QueryBuilder
     }

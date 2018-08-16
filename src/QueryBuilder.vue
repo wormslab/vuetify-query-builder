@@ -108,6 +108,35 @@
   }
 
   export default {
+    created () {
+      this.$validator.extend('in', {
+        getMessage (field, params) {
+          return `${field} 값은 ${params.join(', ')} 중 하나여야 합니다`
+        },
+        validate (value, target) {
+          return target.includes(value)
+        },
+        hasTarget: true
+      })
+      this.$validator.extend('date', {
+        getMessage (field) {
+          return `${field} 값은 YYYY-MM-DD 형식이어야 합니다`
+        },
+        validate (value) {
+          const reg = /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+          return reg.test(value) && moment(value).isValid()
+        }
+      })
+      this.$validator.extend('datetime', {
+        getMessage (field) {
+          return `${field} 값은 YYYY-MM-DD HH:mm:ss 형식이어야 합니다`
+        },
+        validate (value) {
+          const reg = /[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/
+          return reg.test(value) && moment(value).isValid()
+        }
+      })
+    },
     data () {
       return {
         startMenu: false,
