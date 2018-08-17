@@ -90,7 +90,7 @@
         if (item) {
           this.query.type = item.type
           this.query.values = item.values
-          this.query.operator = ''
+          this.query.operator = this.operators[0].value
           this.query.value = ''
           this.$forceUpdate()
         }

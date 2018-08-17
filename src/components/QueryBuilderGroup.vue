@@ -6,9 +6,18 @@
         <v-select :items="types" v-model="query.operator" item-text="text" :disabled="query.children.length <= 0" item-value="value" single-line />
       </div>
       <span>규칙와 일치</span>
-      <v-btn icon @click="_handleClickAddGroup" :disabled="maxDepth <= depth"><v-icon color="grey">playlist_add</v-icon></v-btn>
-      <v-btn icon @click="_handleClickAddRule"><v-icon color="grey">add_circle</v-icon></v-btn>
-      <v-btn icon @click="_handleClickRemoveGroup(query.id)" v-if="depth > 1"><v-icon color="grey">cancel</v-icon></v-btn>
+      <v-tooltip bottom>
+        <v-btn slot="activator" icon @click="_handleClickAddGroup" :disabled="maxDepth <= depth"><v-icon color="grey">playlist_add</v-icon></v-btn>
+        <span>{{addGroupText}}</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <v-btn slot="activator" icon @click="_handleClickAddRule"><v-icon color="grey">add_circle</v-icon></v-btn>
+        <span>{{addRuleText}}</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <v-btn slot="activator" icon @click="_handleClickRemoveGroup(query.id)" v-if="depth > 1"><v-icon color="grey">cancel</v-icon></v-btn>
+        <span>{{removeGroupText}}</span>
+      </v-tooltip>
     </section>
     <draggable v-model="query.children" :options="{animation:150,handle:'.query-builder-drag-icon'}">
       <transition-group>
@@ -34,7 +43,10 @@
                                 :query="child.query"
                                 @enter-keyup="_handleEnterKeyUp"
             />
-            <v-btn icon @click="_handleClickRemoveRule(index)"><v-icon class="query-builder-rule-icon" color="grey">cancel</v-icon></v-btn>
+            <v-tooltip bottom>
+              <v-btn slot="activator" icon @click="_handleClickRemoveRule(index)"><v-icon class="query-builder-rule-icon" color="grey">cancel</v-icon></v-btn>
+              <span>{{removeRuleText}}</span>
+            </v-tooltip>
           </section>
         </section>
       </transition-group>
@@ -72,6 +84,22 @@
       maxDepth: {
         type: Number,
         default: 3
+      },
+      addGroupText: {
+        type: String,
+        default: '규칙 그룹을 추가합니다. 규칙 그룹은 여러개의 규칙에 대한 조건을 정의할 수 있습니다'
+      },
+      addRuleText: {
+        type: String,
+        default: '규칙을 추가 합니다'
+      },
+      removeGroupText: {
+        type: String,
+        default: '규칙 그룹을 삭제 합니다. 그룹에 포함된 모든 규칙이 함께 삭제 됩니다'
+      },
+      removeRuleText: {
+        type: String,
+        default: '규칙을 삭제 합니다'
       }
     },
     methods: {

@@ -1,91 +1,109 @@
 <template>
   <section class="query-builder-container">
-    <query-builder-group ref="group"
-                         :types="types"
-                         :operators="operators"
-                         :operands="operands"
-                         :depth="1"
-                         :query="query"
-                         :max-depth="maxDepth"
-                         @enter-keyup="_handleEnterKeyUp"
-    />
-    <slot name="limit">
-      <section class="query-builder-limit">
-        <span>페이지당</span>
-        <div class="limit-select-box">
-          <v-select :items="limits" v-model="query.limit" item-text="text" item-value="value" single-line />
-        </div>
-        <span>개 노출</span>
-      </section>
-    </slot>
-    <slot name="date-range">
-      <section class="query-builder-date">
-        <span class="label-text">{{periodLabel}}</span>
-        <v-menu ref="startMenu"
-                lazy
-                :close-on-content-click="false"
-                v-model="startMenu"
-                transition="scale-transition"
-                offset-y
-                full-width
-                :nudge-right="40"
-                min-width="290px"
-                :return-value.sync="query.from"
-        >
-          <v-text-field slot="activator"
-                        label="From"
-                        v-model="query.from"
-                        prepend-icon="event"
-                        readonly
-          ></v-text-field>
-          <v-date-picker v-model="query.from" no-title scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="startMenu = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.startMenu.save(query.from)">OK</v-btn>
-          </v-date-picker>
-        </v-menu>
-        <span class="tilt"> ~ </span>
-        <v-menu ref="endMenu"
-                lazy
-                :close-on-content-click="false"
-                v-model="endMenu"
-                transition="scale-transition"
-                offset-y
-                full-width
-                :nudge-right="40"
-                min-width="290px"
-                :return-value.sync="query.to"
-        >
-          <v-text-field slot="activator"
-                        label="To"
-                        v-model="query.to"
-                        prepend-icon="event"
-                        readonly
-          ></v-text-field>
-          <v-date-picker v-model="query.to" no-title scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="endMenu = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.endMenu.save(query.to)">OK</v-btn>
-          </v-date-picker>
-        </v-menu>
-        <v-menu open-on-hover top offset-y>
-          <v-btn slot="activator" small outline fab color="primary" dark><v-icon>date_range</v-icon></v-btn>
-          <v-list>
-            <v-list-tile v-for="(item, index) in dateRanges" :key="index" @click="_handleClickDateRange(-item.value, item.unit)">
-              <v-list-tile-title>{{ item.text }}</v-list-tile-title>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
-      </section>
-    </slot>
-    <v-btn color="primary" style="margin-left: -1px" @click="_handleClickSearch">
-      <v-icon left>search</v-icon>
-      <span>검색</span>
+    <v-btn class="expandable-btn" :dark="mode === 'simple'" icon float @click="_handleClickExpand">
+      <v-icon :class="{ 'arrow-transition': mode === 'transition', 'arrow-down': mode === 'simple' }">keyboard_arrow_up</v-icon>
     </v-btn>
-    <v-btn color="primary" @click="_handleClickClear">
-      <v-icon left>clear_all</v-icon>
-      <span>초기화</span>
-    </v-btn>
+    <transition name="slide-y-reverse-transition">
+      <section class="simple-query-builder-container pa-3 primary text--white lighten-2 white--text" v-if="mode === 'simple'">
+        <div>{{periodLabel}} {{query.from}} 부터 {{query.to}} 까지</div>
+        <div v-if="_query.children && _query.children.length > 0">필터조건 {{_query.children.length}} 개 적용하여</div>
+        <div>페이지당 {{query.limit}} 개 노출</div>
+        <div style="height: 11px"></div>
+        <v-btn class="expand-btn elevation-2 primary lighten-1" icon dark round @click="_handleClickExpand">
+          <v-icon>search</v-icon>
+        </v-btn>
+      </section>
+    </transition>
+    <transition name="slide-y-transition">
+      <section class="custom-query-builder-container" v-if="mode === 'custom'">
+        <query-builder-group ref="group"
+                             :types="types"
+                             :operators="operators"
+                             :operands="operands"
+                             :depth="1"
+                             :query="query"
+                             :max-depth="maxDepth"
+                             @enter-keyup="_handleEnterKeyUp"
+        />
+        <slot name="limit">
+          <section class="query-builder-limit">
+            <span>페이지당</span>
+            <div class="limit-select-box">
+              <v-select :items="limits" v-model="query.limit" item-text="text" item-value="value" single-line />
+            </div>
+            <span>개 노출</span>
+          </section>
+        </slot>
+        <slot name="date-range">
+          <section class="query-builder-date">
+            <span class="label-text">{{periodLabel}}</span>
+            <v-menu ref="startMenu"
+                    lazy
+                    :close-on-content-click="false"
+                    v-model="startMenu"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    :nudge-right="40"
+                    min-width="290px"
+                    :return-value.sync="query.from"
+            >
+              <v-text-field slot="activator"
+                            label="From"
+                            v-model="query.from"
+                            prepend-icon="event"
+                            readonly
+              ></v-text-field>
+              <v-date-picker v-model="query.from" no-title scrollable>
+                <v-spacer></v-spacer>
+                <v-btn flat color="primary" @click="startMenu = false">Cancel</v-btn>
+                <v-btn flat color="primary" @click="$refs.startMenu.save(query.from)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+            <span class="tilt"> ~ </span>
+            <v-menu ref="endMenu"
+                    lazy
+                    :close-on-content-click="false"
+                    v-model="endMenu"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    :nudge-right="40"
+                    min-width="290px"
+                    :return-value.sync="query.to"
+            >
+              <v-text-field slot="activator"
+                            label="To"
+                            v-model="query.to"
+                            prepend-icon="event"
+                            readonly
+              ></v-text-field>
+              <v-date-picker v-model="query.to" no-title scrollable>
+                <v-spacer></v-spacer>
+                <v-btn flat color="primary" @click="endMenu = false">Cancel</v-btn>
+                <v-btn flat color="primary" @click="$refs.endMenu.save(query.to)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+            <v-menu open-on-hover top offset-y>
+              <v-btn slot="activator" small outline fab color="primary" dark><v-icon>date_range</v-icon></v-btn>
+              <v-list>
+                <v-list-tile v-for="(item, index) in dateRanges" :key="index" @click="_handleClickDateRange(-item.value, item.unit)">
+                  <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+          </section>
+        </slot>
+        <v-btn color="primary" style="margin-left: -1px" @click="_handleClickSearch">
+          <v-icon left>search</v-icon>
+          <span>검색</span>
+        </v-btn>
+        <v-btn color="primary" @click="_handleClickClear">
+          <v-icon left>clear_all</v-icon>
+          <span>초기화</span>
+        </v-btn>
+      </section>
+    </transition>
   </section>
 </template>
 
@@ -139,6 +157,7 @@
     },
     data () {
       return {
+        mode: this.display,
         startMenu: false,
         endMenu: false,
         limits: this._limits,
@@ -147,6 +166,10 @@
       }
     },
     props: {
+      display: {
+        type: String,
+        default: 'custom'
+      },
       types: {
         type: Array,
         required: true
@@ -206,6 +229,9 @@
         const valid = await this.$refs.group.validateAll()
         this.$emit('search', dupQuery(this.query), valid)
       },
+      _handleClickExpand () {
+         this.$emit('click-expand')
+      },
       _handleClickClear () {
         const query = dupQuery(this._query)
         this.query = query
@@ -228,6 +254,15 @@
           this.query = dupQuery(this._query)
         },
         deep: true
+      },
+      'display': {
+        handler () {
+          this.mode = 'transition'
+          setTimeout(() => {
+            this.mode = this.display
+          }, 300)
+        },
+        deep: true
       }
     },
     components: {
@@ -237,6 +272,27 @@
 </script>
 
 <style scoped>
+  .query-builder-container {
+    position: relative;
+  }
+  .query-builder-container .expandable-btn {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    z-index: 100;
+  }
+  .simple-query-builder-container {
+    position: relative;
+  }
+  .simple-query-builder-container .expand-btn {
+    position: absolute;
+    z-index: 1000;
+    bottom: -21px;
+    left: 11px;
+  }
+  .custom-query-builder-container {
+    position: relative;
+  }
   .query-builder-limit {
     display: flex;
     align-items: center;
@@ -254,5 +310,11 @@
   }
   .query-builder-date > .label-text {
     margin-right: 21px;
+  }
+  .arrow-transition {
+    transform: rotate(180deg);
+  }
+  .arrow-down {
+    transform: rotate(180deg);
   }
 </style>
