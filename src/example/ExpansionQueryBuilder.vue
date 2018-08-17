@@ -9,6 +9,7 @@
                    @click-expand="() => mode = mode === 'simple' ? 'custom' : 'simple'"
                    @search="_handleSearch"
     />
+    <div style="height: 300px; background-color: #BBB"></div>
   </section>
 </template>
 
@@ -72,7 +73,9 @@
           to: '2018-03-31',
           operator: 'ALL',
           limit: 10,
-          children: []
+          children: [
+            { type: 'rule', query: { operand: 'id', operator: '$eq', value: '123', type: 'number' } }
+          ]
         }
       }
     },

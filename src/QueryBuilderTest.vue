@@ -1,7 +1,11 @@
 <template>
   <section>
-    <query-builder-without-initial />
-    <expansion-query-builder />
+    <div>
+      <query-builder-without-initial />
+    </div>
+    <div>
+      <expansion-query-builder />
+    </div>
   </section>
 </template>
 
@@ -17,5 +21,7 @@
 </script>
 
 <style scoped>
-
+  section > div {
+    position: relative;
+  }
 </style>
