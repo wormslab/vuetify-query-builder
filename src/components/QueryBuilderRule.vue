@@ -25,11 +25,11 @@
       />
     </div>
     <div class="value-text-field" v-if="!unaryOperators.includes(query.operator)">
-      <v-select v-if="query.values"
+      <v-select v-if="queryValues(query)"
                 :error-messages="errors.collect(`필터값-${index + 1}`)"
                 v-validate="validateValue"
                 :data-vv-name="`필터값-${index + 1}`"
-                :items="query.values"
+                :items="queryValues(query)"
                 v-model="query.value"
                 :item-text="itemText"
                 :item-value="itemValue"
@@ -50,18 +50,6 @@
 
 <script>
   export default {
-    mounted () {
-      const operand = this.query.operand
-      if (!operand) {
-        return
-      }
-      const item = this.operands.find(v => v.value === operand)
-      if (item) {
-        this.query.type = item.type
-        this.query.values = item.values
-        this.$forceUpdate()
-      }
-    },
     data () {
       return {
         unaryOperators: [ '$null', '$not_null' ]
@@ -99,19 +87,12 @@
       },
       _handleChangeOperand (value) {
         const item = this.operands.find(v => v.value === value)
-        if (item) {
-          this.query.type = item.type
-          this.query.values = item.values
-          this.query.operator = this.operators[0].value
-          this.query.value = ''
-          this.$forceUpdate()
-        }
+        this.query.operator = this.operators[0].value
+        this.query.value = ''
+        this.$forceUpdate()
       },
       _handleChangeOperator (value) {
-        const item = this.operators.find(v => v.value === value)
-        if (item) {
-          this.$forceUpdate()
-        }
+        this.$forceUpdate()
       },
       _handleChangeValues () {
         this.$forceUpdate()
@@ -125,6 +106,13 @@
         if (event && event.code === 'Enter') {
           this.$emit('enter-keyup', event)
         }
+      },
+      queryValues (query) {
+        if (!query.operand) {
+          return null
+        }
+        const operand = this.operands.find(v => v.value === query.operand)
+        return operand.values
       }
     },
     computed: {
