@@ -50,6 +50,18 @@
 
 <script>
   export default {
+    mounted () {
+      const operand = this.query.operand
+      if (!operand) {
+        return
+      }
+      const item = this.operands.find(v => v.value === operand)
+      if (item) {
+        this.query.type = item.type
+        this.query.values = item.values
+        this.$forceUpdate()
+      }
+    },
     data () {
       return {
         unaryOperators: [ '$null', '$not_null' ]
@@ -161,5 +173,6 @@
   .query-builder-rule-container > div {
     flex: 1 1 0;
     margin-right: 21px;
+    width: 250px;
   }
 </style>

@@ -5,7 +5,7 @@
       <div class="type-select-box">
         <v-select :items="types" v-model="query.operator" item-text="text" :disabled="query.children.length <= 0" item-value="value" single-line />
       </div>
-      <span>규칙와 일치</span>
+      <span>규칙과 일치</span>
       <v-tooltip bottom>
         <v-btn slot="activator" icon @click="_handleClickAddGroup" :disabled="maxDepth <= depth"><v-icon color="grey">playlist_add</v-icon></v-btn>
         <span>{{addGroupText}}</span>

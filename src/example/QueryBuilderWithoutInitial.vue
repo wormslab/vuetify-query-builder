@@ -60,6 +60,14 @@
   ]
   export default {
     data() {
+      const children = [{
+        type: 'rule',
+        query: {
+          operator: '$eq',
+          operand: 'resource',
+          value: 'contents'
+        }
+      }]
       return {
         types,
         operators,
@@ -69,7 +77,7 @@
           to: '2018-03-31',
           operator: 'ALL',
           limit: 10,
-          children: []
+          children
         }
       }
     },
