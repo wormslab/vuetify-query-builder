@@ -5,13 +5,28 @@
                    :operands="operands"
                    :max-depth="3"
                    :_query="query"
+                   @add-group="handleArguments"
+                   @add-rule="handleArguments"
+                   @rmoeve-group="handleArguments"
+                   @remove-rule="handleArguments"
+                   @change-operand="_handleSelectOperand"
+                   @change-operator="handleArguments"
+                   @change-value="handleArguments"
                    @search="_handleSearch"
-    />
+    >
+      <div slot="custom-error" class="red--text">errors</div>
+    </query-builder>
   </section>
 </template>
 
 <script>
   import QueryBuilder from '../QueryBuilder'
+  import Vue from 'vue'
+  const selectTest = [
+    { text: 'T1', value: 'start_sync_list_item' },
+    { text: 'T2', value: 'end_sync_list_item' },
+    { text: 'T3', value: 'sync_list_item' }
+  ]
   const types = [
     { text: '전체', value: 'ALL' },
     { text: '일부', value: 'ANY' }
@@ -84,6 +99,19 @@
     methods: {
       _handleSearch (query, validator) {
         console.log(query, validator)
+      },
+      handleArguments (a, b, c) {
+      },
+      _handleSelectOperand (value, query, positions) {
+        const selectTest = [
+          { text: 'T1', value: 'start_sync_list_item' },
+          { text: 'T2', value: 'end_sync_list_item' },
+          { text: 'T3', value: 'sync_list_item' }
+        ]
+        const operand = this.operands.find(v => v.value === value)
+        if (value === 'admin_name' && operand) {
+          Vue.set(operand, 'values', selectTest)
+        }
       }
     },
     components: {

@@ -7,6 +7,13 @@
                          :depth="1"
                          :query="query"
                          :max-depth="maxDepth"
+                         @add-group="_handleAddGroup"
+                         @remove-group="_handleRemoveGroup"
+                         @add-rule="_handleAddRule"
+                         @remove-rule="_handleRemoveRule"
+                         @change-operand="_handleChangeOperand"
+                         @change-operator="_handleChangeOperator"
+                         @change-value="_handleChangeValue"
                          @enter-keyup="_handleEnterKeyUp"
     />
     <slot name="limit">
@@ -78,13 +85,14 @@
         </v-menu>
       </section>
     </slot>
+    <slot name="custom-error"></slot>
     <v-btn color="primary" style="margin-left: -1px" @click="_handleClickSearch">
       <v-icon left>search</v-icon>
-      <span>검색</span>
+      <span>{{searchText}}</span>
     </v-btn>
     <v-btn color="primary" @click="_handleClickClear">
       <v-icon left>clear_all</v-icon>
-      <span>초기화</span>
+      <span>{{clearText}}</span>
     </v-btn>
   </section>
 </template>
@@ -199,6 +207,14 @@
       periodLabel: {
         type: String,
         default: '기간'
+      },
+      searchText: {
+        type: String,
+        default: '검색'
+      },
+      clearText: {
+        type: String,
+        default: '초기화'
       }
     },
     methods: {
@@ -220,6 +236,27 @@
         const start = moment().add(value, unit).format(format)
         this.query.from = start
         this.query.to = current
+      },
+      _handleAddGroup (group) {
+        this.$emit('add-group', group)
+      },
+      _handleRemoveGroup (group) {
+        this.$emit('remove-group', group)
+      },
+      _handleAddRule (rule) {
+        this.$emit('add-rule', rule)
+      },
+      _handleRemoveRule (rule) {
+        this.$emit('remove-rule', rule)
+      },
+      _handleChangeOperand (operand, query) {
+        this.$emit('change-operand', operand, query)
+      },
+      _handleChangeOperator (operator, query) {
+        this.$emit('change-operator', operator, query)
+      },
+      _handleChangeValue (value, query, position) {
+        this.$emit('change-value', value, query, position)
       }
     },
     watch: {

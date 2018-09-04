@@ -3,9 +3,9 @@
     <div class="operand-select-box">
       <v-select :items="operands"
                 v-model="query.operand"
-                :error-messages="errors.collect(`피연산자-${index + 1}`)"
+                :error-messages="errors.collect(`피연산자-${index}`)"
                 v-validate="validateOperand"
-                :data-vv-name="`피연산자-${index + 1}`"
+                :data-vv-name="`피연산자-${index}`"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
@@ -15,9 +15,9 @@
     <div class="operator-select-box">
       <v-select :items="_operators"
                 v-model="query.operator"
-                :error-messages="errors.collect(`연산자-${index + 1}`)"
+                :error-messages="errors.collect(`연산자-${index}`)"
                 v-validate="validateOperator"
-                :data-vv-name="`연산자-${index + 1}`"
+                :data-vv-name="`연산자-${index}`"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
@@ -26,21 +26,21 @@
     </div>
     <div class="value-text-field" v-if="!unaryOperators.includes(query.operator)">
       <v-select v-if="queryValues(query)"
-                :error-messages="errors.collect(`필터값-${index + 1}`)"
+                :error-messages="errors.collect(`필터값-${index}`)"
                 v-validate="validateValue"
-                :data-vv-name="`필터값-${index + 1}`"
+                :data-vv-name="`필터값-${index}`"
                 :items="queryValues(query)"
                 v-model="query.value"
                 :item-text="itemText"
                 :item-value="itemValue"
                 single-line
-                @change="_handleChangeValues"
+                @change="_handleChangeValue"
       />
       <v-text-field v-else
                     v-model="query.value"
-                    :error-messages="errors.collect(`필터값-${index + 1}`)"
+                    :error-messages="errors.collect(`필터값-${index}`)"
                     v-validate="validateValue"
-                    :data-vv-name="`필터값-${index + 1}`"
+                    :data-vv-name="`필터값-${index}`"
                     @input="_handleChangeValue"
                     @keyup.native="_handleEnterKeyUp"
       />
@@ -56,7 +56,14 @@
       }
     },
     props: {
+      /**
+       * 
+       */
       index: {
+        type: String,
+        default: '0'
+      },
+      position: {
         type: Number,
         default: 0
       },
@@ -82,25 +89,24 @@
       }
     },
     methods: {
-      async validateAll () {
-        return await this.$validator.validateAll()
+      validateAll () {
+        return this.$validator.validateAll()
       },
-      _handleChangeOperand (value) {
-        const item = this.operands.find(v => v.value === value)
-        this.query.operator = this.operators[0].value
+      _handleChangeOperand (operand) {
+        // 피연산자를 선택했을 때 연산자가 지정되어 있지 않다면 첫번째 값을 자동으로 입력
+        if (!this.operator) {
+          this.query.operator = this.operators[0].value
+        }
+        // 피연산자를 선택 했을 때 필터 값을 초기화
         this.query.value = ''
-        this.$forceUpdate()
+        this.$emit('change-operand', operand, this.query, [ this.position ])
       },
-      _handleChangeOperator (value) {
-        this.$forceUpdate()
-      },
-      _handleChangeValues () {
-        this.$forceUpdate()
+      _handleChangeOperator (operator) {
+        this.$emit('change-operator', operator, this.query, [ this.position ])
+
       },
       _handleChangeValue (value) {
-        if (value.length > 0) {
-          this.$forceUpdate()
-        }
+        this.$emit('change-value', value, this.query, [ this.position ])
       },
       _handleEnterKeyUp (event) {
         if (event && event.code === 'Enter') {

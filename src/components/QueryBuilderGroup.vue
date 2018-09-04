@@ -29,18 +29,26 @@
                                  :operators="operators"
                                  :operands="operands"
                                  :depth="depth + 1"
+                                 :position="index"
                                  :max-depth="maxDepth"
                                  :query="child.query"
+                                 @change-operand="_handleChangeOperand"
+                                 @change-operator="_handleChangeOperator"
+                                 @change-value="_handleChangeValue"
                                  @remove-group="_handleRemoveGroup"
             />
           </section>
           <section class="query-builder-rule-content" v-if="child.type === 'rule'" :style="`margin-left: ${(depth - 1) * 41}px`">
             <v-icon class="query-builder-drag-icon">reorder</v-icon>
             <query-builder-rule :ref="`rule${index}`"
-                                :index="(depth * 10) + index"
+                                :index="`${position}${depth}${index}`"
+                                :position="index"
                                 :operators="operators"
                                 :operands="operands"
                                 :query="child.query"
+                                @change-operand="_handleChangeOperand"
+                                @change-operator="_handleChangeOperator"
+                                @change-value="_handleChangeValue"
                                 @enter-keyup="_handleEnterKeyUp"
             />
             <v-tooltip bottom>
@@ -61,42 +69,82 @@
   export default {
     name: 'query-builder-group',
     props: {
+      /**
+       * query 의 종류를 표기하기 위한 후보 리스트
+       * 현재는 'group' 과 'rule' 만 사용 함
+       */
       types: {
         type: Array,
         required: true
       },
+      /**
+       * 연산자 리스트
+       */
       operators: {
         type: Array,
         required: true
       },
+      /**
+       * 피연산자 리스트
+       */
       operands: {
         type: Array,
         required: true
       },
+      /**
+       * type, operator, operand, value 를 포함하는 객체
+       */
       query: {
         type: Object,
         required: true
       },
+      /**
+       * 그룹의 중첩을 지원하므로 자신이 몇번째 중첩인지를 표시
+       * 제일 처음의 깊이는 1로 지정
+       */
       depth: {
         type: Number,
         default: 1
       },
+      /**
+       * 쿼리의 복잡도나 API 지원여부에 따라서 최대 중첩 깊이를 제한할 수 있도록 함
+       */
       maxDepth: {
         type: Number,
         default: 3
       },
+      /**
+       * 상위 그룹으로 부터 자신이 몇번째 인덱스에 위치하고 있는지 설명
+       * 제일 처음의 그룹은 0으로 시작
+       */
+      position: {
+        index: Number,
+        default: 0
+      },
+      /**
+       * TODO: I18N 지원을 위해 텍스를 별도로 받을 수 있도록 함
+       */
       addGroupText: {
         type: String,
         default: '규칙 그룹을 추가합니다. 규칙 그룹은 여러개의 규칙에 대한 조건을 정의할 수 있습니다'
       },
+      /**
+       * TODO: I18N 지원을 위해 텍스를 별도로 받을 수 있도록 함
+       */
       addRuleText: {
         type: String,
         default: '규칙을 추가 합니다'
       },
+      /**
+       * TODO: I18N 지원을 위해 텍스를 별도로 받을 수 있도록 함
+       */
       removeGroupText: {
         type: String,
         default: '규칙 그룹을 삭제 합니다. 그룹에 포함된 모든 규칙이 함께 삭제 됩니다'
       },
+      /**
+       * TODO: I18N 지원을 위해 텍스를 별도로 받을 수 있도록 함
+       */
       removeRuleText: {
         type: String,
         default: '규칙을 삭제 합니다'
@@ -119,6 +167,7 @@
             children: []
           }
         })
+        this.$emit('add-group', this.query)
       },
       _handleClickAddRule () {
         this.query.children.push({
@@ -129,9 +178,11 @@
             value: '',
           }
         })
+        this.$emit('add-rule', this.query)
       },
       _handleClickRemoveRule (index) {
         this.query.children.splice(index, 1)
+        this.$emit('remove-rule', this.query)
       },
       _handleClickRemoveGroup (id) {
         this.$emit('remove-group', { id })
@@ -139,6 +190,21 @@
       _handleRemoveGroup ({ id }) {
         const index = this.query.children.findIndex(v => v.id === id)
         this.query.children.splice(index, 1)
+      },
+      _handleChangeOperand (operand, query, positions) {
+        this.$emit('change-operand', operand, query, positions)
+      },
+      _handleChangeOperator (operator, query, positions) {
+        if (this.position !== 0) {
+          positions.push(this.position)
+        }
+        this.$emit('change-operator', operator, query, positions)
+      },
+      _handleChangeValue (value, query, positions) {
+        if (this.position !== 0) {
+          positions.push(this.position)
+        }
+        this.$emit('change-value', value, query, positions)
       },
       _handleEnterKeyUp (event) {
         this.$emit('enter-keyup', event)
