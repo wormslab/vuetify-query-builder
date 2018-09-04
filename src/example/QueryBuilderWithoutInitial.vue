@@ -7,7 +7,7 @@
                    :_query="query"
                    @add-group="handleArguments"
                    @add-rule="handleArguments"
-                   @rmoeve-group="handleArguments"
+                   @remove-group="handleArguments"
                    @remove-rule="handleArguments"
                    @change-operand="_handleSelectOperand"
                    @change-operator="handleArguments"
@@ -100,9 +100,11 @@
       _handleSearch (query, validator) {
         console.log(query, validator)
       },
-      handleArguments (a, b, c) {
+      handleArguments (a, b, c, d, e) {
+        console.log(a, b, c, d, e)
       },
-      _handleSelectOperand (value, query, positions) {
+      _handleSelectOperand (value, query, positions, a) {
+        console.log(value, query, positions, a)
         const selectTest = [
           { text: 'T1', value: 'start_sync_list_item' },
           { text: 'T2', value: 'end_sync_list_item' },

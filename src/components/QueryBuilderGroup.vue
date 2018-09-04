@@ -15,7 +15,7 @@
         <span>{{addRuleText}}</span>
       </v-tooltip>
       <v-tooltip bottom>
-        <v-btn slot="activator" icon @click="_handleClickRemoveGroup(query.id)" v-if="depth > 1"><v-icon color="grey">cancel</v-icon></v-btn>
+        <v-btn slot="activator" icon @click="_handleClickRemoveGroup(position)" v-if="depth > 1"><v-icon color="grey">cancel</v-icon></v-btn>
         <span>{{removeGroupText}}</span>
       </v-tooltip>
     </section>
@@ -32,10 +32,14 @@
                                  :position="index"
                                  :max-depth="maxDepth"
                                  :query="child.query"
+                                 :parent="query"
+                                 @add-group="_handleAddGroup"
+                                 @add-rule="_handleAddRule"
+                                 @remove-group="_handleRemoveGroup"
+                                 @remove-rule="_handleRemoveRule"
                                  @change-operand="_handleChangeOperand"
                                  @change-operator="_handleChangeOperator"
                                  @change-value="_handleChangeValue"
-                                 @remove-group="_handleRemoveGroup"
             />
           </section>
           <section class="query-builder-rule-content" v-if="child.type === 'rule'" :style="`margin-left: ${(depth - 1) * 41}px`">
@@ -114,6 +118,16 @@
         default: 3
       },
       /**
+       * 상위 그룹의 reference 를 넘겨받음
+       * 제일 처음은 상위 그룹이 없으므로 null 상태
+       */
+      parent: {
+        type: Object,
+        default () {
+          return null
+        }
+      },
+      /**
        * 상위 그룹으로 부터 자신이 몇번째 인덱스에 위치하고 있는지 설명
        * 제일 처음의 그룹은 0으로 시작
        */
@@ -159,52 +173,63 @@
         }
         return ret
       },
+      _handleAddGroup () {
+        this.$emit.call(this, 'add-group', ...arguments)
+      },
+      _handleAddRule () {
+        this.$emit.call(this, 'add-rule', ...arguments)
+      },
+      _handleRemoveGroup () {
+        this.$emit.call(this, 'remove-group', ...arguments)
+      },
+      _handleRemoveRule () {
+        this.$emit.call(this, 'remove-rule', ...arguments)
+      },
       _handleClickAddGroup () {
-        this.query.children.push({
+        const group = {
           type: 'group',
           query: {
             operator: 'ALL',
             children: []
           }
-        })
-        this.$emit('add-group', this.query)
+        }
+        this.query.children.push(group)
+        this.$emit('add-group', group, this.query, this.parent)
       },
       _handleClickAddRule () {
-        this.query.children.push({
+        const query = {
           type: 'rule',
           query: {
             operator: '',
             operand: '',
             value: '',
           }
-        })
-        this.$emit('add-rule', this.query)
+        }
+        this.query.children.push(query)
+        this.$emit('add-rule', query, this.query, this.parent)
       },
       _handleClickRemoveRule (index) {
-        this.query.children.splice(index, 1)
-        this.$emit('remove-rule', this.query)
+        const deleted = this.query.children.splice(index, 1)[0]
+        this.$emit('remove-rule', deleted, index, this.query)
       },
-      _handleClickRemoveGroup (id) {
-        this.$emit('remove-group', { id })
-      },
-      _handleRemoveGroup ({ id }) {
-        const index = this.query.children.findIndex(v => v.id === id)
-        this.query.children.splice(index, 1)
+      _handleClickRemoveGroup (index) {
+        const query = this.parent.children.splice(index, 1)[0]
+        this.$emit('remove-group', query, this.position)
       },
       _handleChangeOperand (operand, query, positions) {
-        this.$emit('change-operand', operand, query, positions)
+        this.$emit('change-operand', operand, query, this.query, positions)
       },
       _handleChangeOperator (operator, query, positions) {
         if (this.position !== 0) {
           positions.push(this.position)
         }
-        this.$emit('change-operator', operator, query, positions)
+        this.$emit('change-operator', operator, query, this.query, positions)
       },
       _handleChangeValue (value, query, positions) {
         if (this.position !== 0) {
           positions.push(this.position)
         }
-        this.$emit('change-value', value, query, positions)
+        this.$emit('change-value', value, query, this.query, positions)
       },
       _handleEnterKeyUp (event) {
         this.$emit('enter-keyup', event)

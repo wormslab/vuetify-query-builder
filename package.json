@@ -1,6 +1,6 @@
 {
   "name": "@wormslab/vuetify-query-builder",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "private": false,
   "scripts": {
     "serve": "NODE_ENV=development vue-cli-service serve",

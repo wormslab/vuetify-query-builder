@@ -237,26 +237,26 @@
         this.query.from = start
         this.query.to = current
       },
-      _handleAddGroup (group) {
-        this.$emit('add-group', group)
+      _handleAddGroup () {
+        this.$emit.call(this, 'add-group', ...arguments)
       },
-      _handleRemoveGroup (group) {
-        this.$emit('remove-group', group)
+      _handleRemoveGroup () {
+        this.$emit.call(this, 'remove-group', ...arguments)
       },
       _handleAddRule (rule) {
-        this.$emit('add-rule', rule)
+        this.$emit.call(this, 'add-rule', ...arguments)
       },
       _handleRemoveRule (rule) {
-        this.$emit('remove-rule', rule)
+        this.$emit.call(this, 'remove-rule', ...arguments)
       },
-      _handleChangeOperand (operand, query) {
-        this.$emit('change-operand', operand, query)
+      _handleChangeOperand () {
+        this.$emit.call(this, 'change-operand', ...arguments)
       },
-      _handleChangeOperator (operator, query) {
-        this.$emit('change-operator', operator, query)
+      _handleChangeOperator () {
+        this.$emit.call(this, 'change-operator', ...arguments)
       },
-      _handleChangeValue (value, query, position) {
-        this.$emit('change-value', value, query, position)
+      _handleChangeValue () {
+        this.$emit.call(this, 'change-value', ...arguments)
       }
     },
     watch: {
