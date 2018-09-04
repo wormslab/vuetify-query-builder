@@ -2,6 +2,7 @@
   <section class="query-builder-rule-container">
     <div class="operand-select-box">
       <v-select :items="operands"
+                :item-disabled="itemDisabled"
                 v-model="query.operand"
                 :error-messages="errors.collect(`피연산자-${index}`)"
                 v-validate="validateOperand"
@@ -14,6 +15,7 @@
     </div>
     <div class="operator-select-box">
       <v-select :items="_operators"
+                :item-disabled="itemDisabled"
                 v-model="query.operator"
                 :error-messages="errors.collect(`연산자-${index}`)"
                 v-validate="validateOperator"
@@ -30,6 +32,7 @@
                 v-validate="validateValue"
                 :data-vv-name="`필터값-${index}`"
                 :items="queryValues(query)"
+                :item-disabled="itemDisabled"
                 v-model="query.value"
                 :item-text="itemText"
                 :item-value="itemValue"
@@ -112,6 +115,9 @@
         if (event && event.code === 'Enter') {
           this.$emit('enter-keyup', event)
         }
+      },
+      itemDisabled (select) {
+        return select.disabled || false
       },
       queryValues (query) {
         if (!query.operand) {
