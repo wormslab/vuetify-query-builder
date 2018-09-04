@@ -35,18 +35,18 @@
     { text: '=', value: '$eq' },
     { text: '!=', value: '$ne' },
     { text: '>', value: '$gt' },
-    { text: '<', value: '$lt' },
+    { text: '<', value: '$lt', disabled: true },
     { text: 'LIKE', value: '$like' },
     { text: 'NULL', value: '$null' },
     { text: 'NOT NULL', value: '$not_null' },
   ]
   const operands = [
-    { text: '아이디', value: 'id', type: 'number' },
+    { text: '아이디', value: 'id', type: 'number', disabled: true },
     { text: '관리자 ID', value: 'admin_id', type: 'number' },
     { text: '관리자 이름', value: 'admin_name', type: 'string' },
     { text: '리소스', value: 'resource', type: 'string', values: [
         { text: '컨텐츠', value: 'contents' },
-        { text: '컨텐츠 옵션', value: 'contents_options' },
+        { text: '컨텐츠 옵션', value: 'contents_options', disabled: true },
         { text: '컨텐츠 옵션 아이템', value: 'contents_options_items' },
         { text: '주문', value: 'order' },
       ]

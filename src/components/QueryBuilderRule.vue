@@ -1,6 +1,6 @@
 <template>
   <section class="query-builder-rule-container">
-    <div class="operand-select-box">
+    <div class="operand-select-box mr-3">
       <v-select :items="operands"
                 :item-disabled="itemDisabled"
                 v-model="query.operand"
@@ -13,7 +13,7 @@
                 @change="_handleChangeOperand"
       />
     </div>
-    <div class="operator-select-box">
+    <div class="operator-select-box mr-3">
       <v-select :items="_operators"
                 :item-disabled="itemDisabled"
                 v-model="query.operator"
@@ -24,9 +24,13 @@
                 :item-value="itemValue"
                 single-line
                 @change="_handleChangeOperator"
-      />
+      >
+       <template slot="selection" slot-scope="data">
+          <div class="selected">{{data.item.text}}</div>
+        </template>
+      </v-select>
     </div>
-    <div class="value-text-field" v-if="!unaryOperators.includes(query.operator)">
+    <div class="value-field" v-if="!unaryOperators.includes(query.operator)">
       <v-select v-if="queryValues(query)"
                 :error-messages="errors.collect(`필터값-${index}`)"
                 v-validate="validateValue"
@@ -170,9 +174,18 @@
     position: relative;
     flex-wrap: wrap;
   }
-  .query-builder-rule-container > div {
-    flex: 1 1 0;
-    margin-right: 21px;
-    width: 250px;
+  .operand-select-box {
+    width: 200px;
+  }
+  .operator-select-box {
+    width: 130px;
+  }
+  .value-field {
+    width: 220px;
+  }
+  .selected {
+    flex: 1 1 100%;
+    display: block;
+    text-align: center;
   }
 </style>
