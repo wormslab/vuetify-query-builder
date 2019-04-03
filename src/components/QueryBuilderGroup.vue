@@ -3,7 +3,14 @@
     <section class="query-builder-group-type">
       <span>다음</span>
       <div class="type-select-box">
-        <v-select :items="types" v-model="query.operator" item-text="text" :disabled="query.children.length <= 0" item-value="value" single-line />
+        <v-select
+          v-model="query.operator"
+          item-text="text"
+          item-value="value"
+          :items="types"
+          :disabled="query.children.length <= 0"
+          single-line
+        />
       </div>
       <span>규칙과 일치</span>
       <v-tooltip bottom>
@@ -21,7 +28,7 @@
     </section>
     <draggable v-model="query.children" :options="{animation:150,handle:'.query-builder-drag-icon'}">
       <transition-group>
-        <section class="query-builder-child" v-for="(child, index) in query.children" :key="index">
+        <section class="query-builder-child" v-for="(child, index) in query.children" :key="`${child.type}-${index}`">
           <section class="query-builder-group-content" v-if="child.type === 'group'" :style="`margin-left: ${(depth - 1) * 41}px`">
             <v-icon class="query-builder-drag-icon">reorder</v-icon>
             <query-builder-group :ref="`group${index}`"
